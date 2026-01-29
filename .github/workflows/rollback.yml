@@ -1,0 +1,120 @@
+# Manual Rollback Workflow
+# Logic: Allows manual reversion of the production environment to a previous state using stored artifacts.
+# Triggers: Manual dispatch with a specific Run ID.
+
+name: Manual Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: 'Target GitHub Actions Run ID'
+        required: true
+        type: string
+      reason:
+        description: 'Reason for rollback'
+        required: true
+        type: string
+
+env:
+  NODE_VERSION: '20'
+  FIREBASE_PROJECT_ID: 'tylerfortune-website'
+
+jobs:
+  rollback:
+    name: Execute Rollback
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read # Required for downloading artifacts from other runs
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Download Build Artifacts
+        # Logic: Retrieves the specific version of artifacts defined by the Run ID.
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+          run-id: ${{ github.event.inputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+          npm install -g firebase-tools
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_TYLERFORTUNE_WEBSITE }}
+
+      - name: Create Environment Variables
+        run: |
+          echo "Creating functions/.env file..."
+          echo "SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}" > functions/.env
+          echo "RECAPTCHA_SECRET=${{ secrets.RECAPTCHA_SECRET }}" >> functions/.env
+
+      - name: Deploy Rollback
+        # Logic: Forces a deployment of the retrieved artifacts to production.
+        run: |
+          echo "Initiating rollback to version from Run ID: ${{ github.event.inputs.run_id }}"
+          echo "Rollback Reason: ${{ github.event.inputs.reason }}"
+          
+          firebase use ${{ env.FIREBASE_PROJECT_ID }}
+          firebase deploy --project ${{ env.FIREBASE_PROJECT_ID }} --force --non-interactive
+
+      - name: Rollback Summary
+        if: always()
+        run: |
+          echo "## Rollback Execution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target Run ID**: ${{ github.event.inputs.run_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Reason**: ${{ github.event.inputs.reason }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Discord Notification
+        if: always()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          STATUS: ${{ job.status }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "Discord Webhook not configured. Skipping notification."
+            exit 0
+          fi
+
+          if [ "$STATUS" == "success" ]; then
+            COLOR=5763719 # Green
+            TITLE="✅ Rollback Successful"
+          else
+            COLOR=15548997 # Red
+            TITLE="❌ Rollback Failed"
+          fi
+
+          # Construct JSON payload
+          cat <<EOF > discord_payload.json
+          {
+            "username": "GitHub Actions",
+            "embeds": [{
+              "title": "$TITLE",
+              "description": "Manual rollback execution completed.",
+              "color": $COLOR,
+              "fields": [
+                { "name": "Target Run ID", "value": "${{ github.event.inputs.run_id }}", "inline": true },
+                { "name": "Initiated By", "value": "${{ github.actor }}", "inline": true },
+                { "name": "Reason", "value": "Manual Rollback", "inline": false }
+              ],
+              "footer": { "text": "Current Run ID: ${{ github.run_id }}" },
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            }]
+          }
+          EOF
+
+          curl -H "Content-Type: application/json" -d @discord_payload.json "$DISCORD_WEBHOOK"

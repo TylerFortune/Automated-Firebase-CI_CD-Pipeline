@@ -1,0 +1,18 @@
+{
+  "name": "tylerfortune-portfolio",
+  "version": "1.0.0",
+  "description": "Professional portfolio with automated CI/CD pipeline",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "jest",
+    "build": "echo 'Building assets...' && mkdir -p public/css && echo 'body { color: #333; }' > public/css/styles.min.css"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.0.0",
+    "firebase-functions": "^4.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "jest": "^29.0.0"
+  }
+}

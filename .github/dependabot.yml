@@ -1,0 +1,20 @@
+version: 2
+updates:
+  # Maintain npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Logic: Add labels to categorize dependency updates and security fixes
+    labels:
+      - "dependencies"
+      - "npm"
+    open-pull-requests-limit: 10
+  # Maintain GitHub Actions versions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    labels:
+      - "dependencies"
+      - "github-actions"

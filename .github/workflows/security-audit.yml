@@ -1,0 +1,91 @@
+# Bi-Weekly Security Audit
+# Logic: Runs a scheduled security audit of npm dependencies and notifies Discord of the results.
+# Triggers: Runs on the 1st and 15th of each month, and can be triggered manually.
+
+name: Bi-Weekly Security Audit
+
+on:
+  schedule:
+    # Runs at 08:00 UTC on the 1st and 15th of every month, approximating a bi-weekly schedule.
+    - cron: '0 8 1,15 * *'
+  workflow_dispatch: # Allows for manual triggering of the audit.
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  audit:
+    name: NPM Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Security Audit
+        id: npm_audit
+        # Logic: Check for vulnerabilities. Capture exit code manually to prevent step failure.
+        run: |
+          npm audit --audit-level=high && echo "exit_code=0" >> $GITHUB_OUTPUT || echo "exit_code=1" >> $GITHUB_OUTPUT
+
+      - name: Check Outdated Packages
+        id: npm_outdated
+        # Logic: Check for outdated packages. Capture exit code manually.
+        run: |
+          npm outdated && echo "exit_code=0" >> $GITHUB_OUTPUT || echo "exit_code=1" >> $GITHUB_OUTPUT
+
+      - name: Discord Notification
+        if: always()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          AUDIT_EXIT_CODE: ${{ steps.npm_audit.outputs.exit_code }}
+          OUTDATED_EXIT_CODE: ${{ steps.npm_outdated.outputs.exit_code }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "Discord Webhook not configured. Skipping notification."
+            exit 0
+          fi
+
+          if [ "$AUDIT_EXIT_CODE" -eq 0 ] && [ "$OUTDATED_EXIT_CODE" -eq 0 ]; then
+            COLOR=5763719 # Green
+            TITLE="✅ Bi-Weekly Audit: System Healthy"
+            DESCRIPTION="Security audit passed and all packages are up to date."
+            FIELDS="[{ \"name\": \"Repository\", \"value\": \"${{ github.repository }}\", \"inline\": true }, { \"name\": \"Trigger\", \"value\": \"Scheduled Scan\", \"inline\": true }]"
+          elif [ "$AUDIT_EXIT_CODE" -ne 0 ]; then
+            COLOR=15548997 # Red
+            TITLE="🚨 Bi-Weekly Security Audit: Vulnerabilities Detected"
+            DESCRIPTION="High-severity vulnerabilities were found in project dependencies. Please review the audit log and update packages."
+            ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            FIELDS="[{ \"name\": \"Repository\", \"value\": \"${{ github.repository }}\", \"inline\": true }, { \"name\": \"Trigger\", \"value\": \"Scheduled Scan\", \"inline\": true }, { \"name\": \"View Audit Log\", \"value\": \"[Click here to see logs]($ACTION_URL)\", \"inline\": false }]"
+          else
+            COLOR=16776960 # Yellow
+            TITLE="⚠️ Bi-Weekly Audit: Outdated Packages Detected"
+            DESCRIPTION="No high-severity vulnerabilities found, but some packages are outdated. Consider updating dependencies."
+            ACTION_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            FIELDS="[{ \"name\": \"Repository\", \"value\": \"${{ github.repository }}\", \"inline\": true }, { \"name\": \"Trigger\", \"value\": \"Scheduled Scan\", \"inline\": true }, { \"name\": \"View Outdated List\", \"value\": \"[Click here to see logs]($ACTION_URL)\", \"inline\": false }]"
+          fi
+
+          cat <<EOF > discord_payload.json
+          {
+            "username": "GitHub Security Bot",
+            "embeds": [{
+              "title": "$TITLE", "description": "$DESCRIPTION", "color": $COLOR, "fields": $FIELDS,
+              "footer": { "text": "Run ID: ${{ github.run_id }}" }, "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            }]
+          }
+          EOF
+
+          curl -H "Content-Type: application/json" -d @discord_payload.json "$DISCORD_WEBHOOK"
+
+      - name: Fail job if audit failed
+        # This step ensures the workflow run is marked as failed if vulnerabilities were found.
+        if: steps.npm_audit.outputs.exit_code != '0'
+        run: exit 1

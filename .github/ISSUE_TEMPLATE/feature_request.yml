@@ -1,0 +1,169 @@
+name: ✨ Feature Request
+description: Suggest a new feature or enhancement for the portfolio website
+title: "[FEATURE] "
+labels: ["enhancement", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature! Please provide as much detail as possible to help us understand your request.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Please confirm the following before submitting
+      options:
+        - label: I have searched for existing feature requests similar to this one
+          required: true
+        - label: This feature would benefit other users, not just myself
+          required: true
+
+  - type: textarea
+    id: feature-summary
+    attributes:
+      label: Feature Summary
+      description: A brief, clear summary of the feature you'd like to see
+      placeholder: Summarize the feature in 1-2 sentences
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? What need does it address?
+      placeholder: |
+        Describe the problem or need this feature would address.
+        Example: "It's difficult to navigate between portfolio items because..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution you'd like to see implemented
+      placeholder: |
+        Describe your proposed solution in detail.
+        Include any specific implementation ideas, UI changes, or functionality.
+    validations:
+      required: true
+
+  - type: textarea
+    id: user-story
+    attributes:
+      label: User Story
+      description: Write a user story that describes how this feature would be used
+      placeholder: |
+        As a [type of user], I want [goal/desire] so that [benefit/reason].
+        Example: "As a potential employer, I want to filter portfolio projects by technology so that I can quickly find relevant work examples."
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What criteria must be met for this feature to be considered complete?
+      placeholder: |
+        List the specific requirements for this feature:
+        - [ ] Requirement 1
+        - [ ] Requirement 2
+        - [ ] Requirement 3
+
+  - type: textarea
+    id: mockups-designs
+    attributes:
+      label: Mockups or Designs
+      description: If you have any mockups, wireframes, or design ideas, please share them
+      placeholder: Paste images here or provide links to design files
+
+  - type: textarea
+    id: alternatives-considered
+    attributes:
+      label: Alternatives Considered
+      description: What alternative solutions or features have you considered?
+      placeholder: Describe any alternative approaches you've thought about
+
+  - type: dropdown
+    id: feature-category
+    attributes:
+      label: Feature Category
+      description: Which area of the website does this feature relate to?
+      options:
+        - Navigation/UI
+        - Portfolio Display
+        - Contact Form
+        - About Section
+        - Resume/CV
+        - Performance/Optimization
+        - Accessibility
+        - Mobile Experience
+        - SEO/Analytics
+        - Content Management
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Low - Nice to have
+        - Medium - Would improve user experience
+        - High - Important for usability
+        - Critical - Essential feature
+    validations:
+      required: true
+
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated Complexity
+      description: How complex do you think this feature would be to implement?
+      options:
+        - Simple - Minor changes or additions
+        - Medium - Moderate development effort
+        - Complex - Significant changes required
+        - Major - Extensive development and testing
+        - Unknown - Not sure about complexity
+
+  - type: checkboxes
+    id: implementation-areas
+    attributes:
+      label: Implementation Areas
+      description: Which parts of the codebase would likely be affected? (Check all that apply)
+      options:
+        - label: Frontend (HTML/CSS/JavaScript)
+        - label: Backend (Firebase Functions)
+        - label: Database/Storage
+        - label: CI/CD Pipeline
+        - label: Configuration
+        - label: Documentation
+        - label: Testing
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, examples, or information about the feature request
+      placeholder: |
+        Any additional information that might be helpful:
+        - Links to similar features on other sites
+        - Technical considerations
+        - Dependencies or requirements
+        - Impact on existing functionality
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      description: Would you be interested in contributing to this feature?
+      options:
+        - label: I would be willing to help implement this feature
+        - label: I would be willing to help test this feature
+        - label: I would be willing to help with documentation
+        - label: I would prefer someone else implements this
