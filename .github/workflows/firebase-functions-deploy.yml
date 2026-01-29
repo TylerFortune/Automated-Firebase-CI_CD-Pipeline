@@ -224,7 +224,7 @@ jobs:
 
       - name: Download Build Artifacts
         # Logic: Retrieves pre-built artifacts to avoid redundant processing.
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: build-artifacts
         
@@ -324,7 +324,7 @@ jobs:
         
       - name: Download Build Artifacts
         # Logic: Retrieves pre-built artifacts to avoid redundant processing.
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: build-artifacts
         
