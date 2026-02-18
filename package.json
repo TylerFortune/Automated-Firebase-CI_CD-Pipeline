@@ -1,5 +1,5 @@
 {
-  "name": "tylerfortune-portfolio",
+  "name": "firebase-github-actions-cicd",
   "version": "1.0.0",
   "description": "Professional portfolio with automated CI/CD pipeline",
   "scripts": {
@@ -10,6 +10,10 @@
   "dependencies": {
     "firebase-admin": "^11.0.0",
     "firebase-functions": "^4.0.0"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=9.0.0"
   },
   "devDependencies": {
     "eslint": "^8.0.0",

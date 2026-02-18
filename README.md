@@ -12,55 +12,45 @@
 ---
 
 ## 📖 Overview
-This project demonstrates a **secure, production-ready DevOps pipeline** for deploying a serverless application. It moves beyond basic deployment to include security auditing, conditional build logic, and automated verification.
+I developed this repository to showcase a **secure, production-ready DevOps pipeline** for deploying serverless applications. My goal was to move beyond basic deployment by architecting a system that prioritizes security auditing, high-performance execution, and automated verification.
 
-### 🏗️ System Architecture
-The application leverages a serverless architecture to ensure high availability and zero maintenance.
+As an IT Project Manager and Developer, I designed this workflow to handle the complexities of modern software delivery—ensuring that every line of code is validated, optimized, and securely deployed without manual intervention.
 
-![System Architecture](https://mermaid.ink/img/Z3JhcGggTFIKICAgIFVzZXIoKFVzZXIpKSAtLT58SFRUUFN8IENETlsiRmlyZWJhc2UgSG9zdGluZzxici8+KEZyb250ZW5kKSJdCiAgICBVc2VyIC0tPnxQT1NUIC9zZW5kbWFpbHwgRnVuY1siQ2xvdWQgRnVuY3Rpb248YnIvPihCYWNrZW5kKSJdCiAgICAKICAgIHN1YmdyYXBoIFNlY3VyaXR5IExheWVyCiAgICBGdW5jIC0tPnxWZXJpZnl8IFJlY2FwdGNoYVtHb29nbGUgcmVDQVBUQ0hBXQogICAgZW5kCiAgICAKICAgIHN1YmdyYXBoIEV4dGVybmFsIFNlcnZpY2VzCiAgICBGdW5jIC0tPnxEaXNwYXRjaHwgU2VuZEdyaWRbU2VuZEdyaWQgQVBJXQogICAgZW5kCiAgICAKICAgIHN0eWxlIENETiBmaWxsOiNmZmVjYjMsc3Ryb2tlOiNmZjZmMDAKICAgIHN0eWxlIEZ1bmMgZmlsbDojZTFmNWZlLHN0cm9rZTojMDI3N2JkCiAgICBzdHlsZSBSZWNhcHRjaGEgZmlsbDojZjVmNWY1LHN0cm9rZTojYmRiZGJkCiAgICBzdHlsZSBTZW5kR3JpZCBmaWxsOiNlOGY1ZTksc3Ryb2tlOiMyZTdkMzI=)
+### 🏗️ My System Architecture
+I leverage a serverless architecture to guarantee high availability and eliminate maintenance overhead. 
 
----
-
-## 🚀 CI/CD Pipeline Logic
-The core value of this repository is the **GitHub Actions Workflow** (`.github/workflows/firebase-functions-deploy.yml`), which orchestrates the entire software lifecycle.
-
-![CI/CD Pipeline](https://mermaid.ink/img/Z3JhcGggVEQKICAgIFB1c2hbQ29kZSBQdXNoXSAtLT4gUGFyYWxsZWx7UnVuIGluIFBhcmFsbGVsfQogICAgCiAgICBzdWJncmFwaCBDSSBbQ29udGludW91cyBJbnRlZ3JhdGlvbl0KICAgICAgICBQYXJhbGxlbCAtLT4gTGludCgiTGludGluZyAmIFN0eWxlIikKICAgICAgICBQYXJhbGxlbCAtLT4gQXVkaXQoIlNlY3VyaXR5IEF1ZGl0IikKICAgICAgICBQYXJhbGxlbCAtLT4gVGVzdCgiVW5pdCBUZXN0cyIpCiAgICBlbmQKCiAgICBMaW50ICYgQXVkaXQgJiBUZXN0IC0tPiBDaGVja3tBbGwgUGFzcz99CiAgICAKICAgIENoZWNrIC0tIE5vIC0tPiBGYWlsWyLinYwgU3RvcCBQaXBlbGluZSJdCiAgICBDaGVjayAtLSBZZXMgLS0+IEJ1aWxkWyJCdWlsZCAmIE9wdGltaXplIEFzc2V0cyJdCgogICAgc3ViZ3JhcGggQ0QgW0NvbnRpbnVvdXMgRGVwbG95bWVudF0KICAgICAgICBCdWlsZCAtLT4gRW52e0JyYW5jaD99CiAgICAgICAgRW52IC0tIE1haW4gLS0+IFByb2RbIvCfmoAgRGVwbG95IFByb2R1Y3Rpb24iXQogICAgICAgIEVudiAtLSBQUiAtLT4gUHJldmlld1si8J+RgCBEZXBsb3kgUHJldmlldyBDaGFubmVsIl0KICAgIGVuZAogICAgCiAgICBQcm9kIC0tPiBWZXJpZnlbIvCfj6UgSGVhbHRoIENoZWNrIl0KICAgIFZlcmlmeSAtLT4gTm90aWZ5WyLwn5SUIERpc2NvcmQgTm90aWZpY2F0aW9uIl0KCiAgICBzdHlsZSBDSSBmaWxsOiNmOWZiZTcsc3Ryb2tlOiM4Mjc3MTcsc3Ryb2tlLWRhc2hhcnJheTogNSA1CiAgICBzdHlsZSBDRCBmaWxsOiNlM2YyZmQsc3Ryb2tlOiMwZDQ3YTEKICAgIHN0eWxlIFZlcmlmeSBmaWxsOiNmY2U0ZWMsc3Ryb2tlOiM4ODBlNGY=)
+![System Architecture](https://mermaid.ink/img/Z3JhcGggTFIKICAgIFVzZXIoKFVzZXIpKSAtLT58SFRUUFN8IENETlsiRmlyZWJhc2UgSG9zdGluZzxici8+KEZyb250ZW5kKSJdCiAgICBVc2VyIC0tPnxQT1NUIC9zZW5kbWFpbHwgRnVuY1siQ2xvdWQgRnVuY3Rpb248YnIvPihCYWNrZW5kKSJdCiAgICAKICAgIHN1YmdyYXBoIFNlY3VyaXR5IExheWVyCiAgICBGdW5jIC0tPnxWZXJpZnl8IFJlY2FwdGNoYVtHb29nbGUgcmVDQVBUQ0hBXQogICAgZW5kCiAgICAKICAgIHN0eWxlIENETiBmaWxsOiNmZmVjYjMsc3Ryb2tlOiNmZjZmMDAKICAgIHN0eWxlIEZ1bmMgZmlsbDojZTFmNWZlLHN0cm9rZTojMDI3N2JkCiAgICBzdHlsZSBSZWNhcHRjaGEgZmlsbDojZjVmNWY1LHN0cm9rZTojYmRiZGJk)
 
 ---
 
-## ✨ Key Features
+## 🚀 My CI/CD Pipeline Logic
+The core value of this project lies in the **GitHub Actions Workflow** (`.github/workflows/firebase-functions-deploy.yml`). I've orchestrated this pipeline to handle the entire software lifecycle with a focus on **speed and integrity**.
 
-| Feature | Description |
+![CI/CD Pipeline](https://mermaid.ink/img/Z3JhcGggVEQKICAgIFB1c2hbQ29kZSBQdXNoXSAtLT4gUGFyYWxsZWx7UnVuIGluIFBhcmFsbGVsfQogICAgCiAgICBzdWJncmFwaCBDSSBbQ29udGludW91cyBJbnRlZ3JhdGlvbl0KICAgICAgICBQYXJhbGxlbCAtLT4gTGludCgiTGludGluZyAmIFN0eWxlIikKICAgICAgICBQYXJhbGxlbCAtLT4gQXVkaXQoIlNlY3VyaXR5IEF1ZGl0IikKICAgICAgICBQYXJhbGxlbCAtLT4gVGVzdCgiVW5pdCBUZXN0cyIpCiAgICBlbmQKCiAgICBMaW50ICYgQXVkaXQgJiBUZXN0IC0tPiBDaGVja3tBbGwgUGFzcz99CiAgICAKICAgIENoZWNrIC0tIE5vIC0tPiBGYWlsWSLinYwgU3RvcCBQaXBlbGluZSJdCiAgICBDaGVjayAtLSBZZXMgLS0+IEJ1aWxkWyJCdWlsZCAmIE9wdGltaXplIEFzc2V0cyJdCgogICAgc3ViZ3JhcGggQ0QgW0NvbnRpbnVvdXMgRGVwbG95bWVudF0KICAgICAgICBCdWlsZCAtLT4gRW52e0JyYW5jaD99CiAgICAgICAgRW52IC0tIE1haW4gLS0+IFByb2RbIvCfmoAgRGVwbG95IFByb2R1Y3Rpb24iXQogICAgICAgIEVudiAtLSBQUiAtLT4gUHJldmlld1si8J+RgCBEZXBsb3kgUHJldmlldyBDaGFubmVsIl0KICAgIGVuZAogICAgCiAgICBQcm9kIC0tPiBWZXJpZnlbIvCfj6UgSGVhbHRoIENoZWNrIl0KICAgIFZlcmlmeSAtLT4gTm90aWZ5WyLwn5SUIERpc2NvcmQgTm90aWZpY2F0aW9uIl0KCiAgICBzdHlsZSBDSSBmaWxsOiNmOWZiZTcsc3Ryb2tlOiM4Mjc3MTcsc3Ryb2tlLWRhc2hhcnJheTogNSA1CiAgICBzdHlsZSBDRCBmaWxsOiNlM2YyZmQsc3Ryb2tlOiMwZDQ3YTEKICAgIHN0eWxlIFZlcmlmeSBmaWxsOiNmY2U0ZWMsc3Ryb2tlOiM4ODBlNGY=)
+
+---
+
+## ✨ Key Features I've Implemented
+
+| Feature | My Logic |
 | :--- | :--- |
-| **🧠 Smart Deployment** | Detects changes in `functions/` vs `public/` to only deploy what changed. |
-| **🛡️ Security Gates** | Fails build on `npm audit` vulnerabilities or invalid secrets. |
-| **👀 PR Previews** | Automatically deploys a temporary live link for every Pull Request. |
-| **🤖 Bot Integration** | Comments on PRs with preview links & notifies Discord on status. |
-| **🧪 Self-Healing** | Runs post-deploy `curl` health checks to verify site availability. |
+| **🧠 Smart Deployment** | I use change detection to deploy only modified components (`functions/` or `public/`), saving minutes per run. |
+| **🛡️ Security Gates** | I've integrated `npm audit` and secret validation to block vulnerable code from reaching production. |
+| **👀 PR Previews** | I've automated the deployment of unique preview links for every Pull Request to facilitate rapid code review. |
+| **🤖 Bot Integration** | My pipeline communicates status updates to Discord and provides direct preview links in PR comments. |
+| **🧪 Self-Healing** | I've added post-deployment `curl` health checks to ensure the live site is functional before closing the workflow. |
 
 ---
-
-## 📂 Project Structure
-
-```bash
-├── .github/workflows/   # ⚙️ CI/CD Definitions
-├── functions/           # ⚡ Backend (Cloud Functions)
-│   ├── index.js         #    - API Logic
-│   └── package.json     #    - Backend Dependencies
-├── public/              # 🎨 Frontend (Hosting)
-├── test/                # 🧪 Automated Tests
-├── firebase.json        # ☁️ Infrastructure Config
-└── package.json         # 📦 Project Root
-```
 
 ## 🛠️ Configuration
 
-To replicate this pipeline, set these **GitHub Secrets**:
+To replicate my pipeline, you will need to configure these **GitHub Secrets**:
 
-*   🔑 `FIREBASE_SERVICE_ACCOUNT_PROD`: Service Account JSON.
-*   📧 `SENDGRID_API_KEY`: Email service API key.
-*   🤖 `RECAPTCHA_SECRET`: Google reCAPTCHA secret.
-*   🔔 `DISCORD_WEBHOOK`: URL for status notifications.
+*   🔑 `FIREBASE_SERVICE_ACCOUNT_PROD`: Your Firebase Service Account JSON.
+*   🤖 `RECAPTCHA_SECRET`: Your Google reCAPTCHA secret key.
+*   🔔 `DISCORD_WEBHOOK`: Your Discord channel webhook URL for notifications.
+
+For a deep dive into my architectural choices and performance optimizations, please see [CONSTRUCTION.md](./CONSTRUCTION.md).
 
 ---
 <div align="center">

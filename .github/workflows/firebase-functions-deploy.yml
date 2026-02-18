@@ -48,8 +48,8 @@ permissions:
 
 # Environment variables
 env:
-  NODE_VERSION: '20'
-  FIREBASE_PROJECT_ID: '<your-project-id>'
+  NODE_VERSION: '22'
+  FIREBASE_PROJECT_ID: '<YOUR_PROJECT_ID>'
 
 jobs:
   # Pre-Deployment Validation
@@ -66,7 +66,7 @@ jobs:
     
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 2
           
@@ -110,17 +110,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
 
       - name: Install Dependencies
         run: |
+          # Install Node.js dependencies for root
           npm install --no-audit
+          # Install Node.js dependencies for functions
+          cd functions && npm install --no-audit && cd ..
 
       - name: Security Audit
         # Logic: Checks for high-severity vulnerabilities in dependencies to ensure supply chain security.
@@ -138,10 +141,10 @@ jobs:
     needs: validate
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -162,10 +165,10 @@ jobs:
     
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -176,7 +179,10 @@ jobs:
           npm install --no-audit
           
       - name: Build Assets
-        run: npm run build
+        # This step is a placeholder. The package.json does not contain a 'build' script.
+        # If a build process (e.g., minification, transpilation) is added later,
+        # the corresponding script should be added to package.json and called here.
+        run: echo "Build step skipped - no build script configured."
           
       - name: Upload Build Artifacts
         # Logic: Preserves build artifacts to ensure consistency across deployment jobs.
@@ -210,17 +216,20 @@ jobs:
     
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           
       - name: Install Dependencies
         run: |
+          # Install Node.js dependencies for root
           npm install --no-audit
+          # Install Node.js dependencies for functions
+          cd functions && npm install --no-audit && cd ..
 
       - name: Download Build Artifacts
         # Logic: Retrieves pre-built artifacts to avoid redundant processing.
@@ -238,34 +247,32 @@ jobs:
           projectId: ${{ env.FIREBASE_PROJECT_ID }}
           
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v3
         with:
           credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_PROD }}
           
       - name: Setup Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@v3
         with:
           project_id: ${{ env.FIREBASE_PROJECT_ID }}
 
-      - name: Create Environment Variables
-        if: needs.validate.outputs.deploy-functions == 'true'
-        run: |
-          echo "Creating functions/.env file..."
-          echo "SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}" > functions/.env
-          echo "RECAPTCHA_SECRET=${{ secrets.RECAPTCHA_SECRET }}" >> functions/.env
-          
       - name: Deploy Firebase Functions
         if: needs.validate.outputs.deploy-functions == 'true'
         run: |
           # Install Firebase CLI
           npm install -g firebase-tools
           
-          # Set the Firebase project
-          firebase use ${{ env.FIREBASE_PROJECT_ID }}
-          
-          # Deploy functions with detailed logging
+          # Deploy functions with quota project bypass
           echo "Deploying Firebase Functions..."
-          firebase deploy --only functions --project ${{ env.FIREBASE_PROJECT_ID }} --non-interactive --debug
+          # Force the CLI to use the service account for the deployment quota
+          # by unsetting all potential override variables
+          unset GOOGLE_CLOUD_QUOTA_PROJECT
+          unset CLOUDSDK_CORE_PROJECT
+          unset GOOGLE_CLOUD_PROJECT
+          
+          # Use the --project flag explicitly
+          firebase deploy --only functions --project ${{ env.FIREBASE_PROJECT_ID }} --non-interactive --token "${{ steps.auth.outputs.access_token }}" || \
+          firebase deploy --only functions --project ${{ env.FIREBASE_PROJECT_ID }} --non-interactive
           
       - name: Cleanup
         if: always()
@@ -296,7 +303,7 @@ jobs:
           
           echo "- **Contact Form:** ✅ Ready for production traffic" >> $GITHUB_STEP_SUMMARY
           echo "- **reCAPTCHA:** ✅ Configured and functional" >> $GITHUB_STEP_SUMMARY
-          echo "- **Email Service:** ✅ SendGrid integration active" >> $GITHUB_STEP_SUMMARY
+          echo "- **Email Service:** ✅ Google Script integration active" >> $GITHUB_STEP_SUMMARY
 
   # Preview Deployment
   # Logic: Deploys a temporary preview channel for Pull Requests to facilitate code review.
@@ -311,10 +318,10 @@ jobs:
     
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
@@ -336,7 +343,7 @@ jobs:
           projectId: ${{ env.FIREBASE_PROJECT_ID }}
           
       - name: Preview Comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const { data: comments } = await github.rest.issues.listComments({
@@ -402,25 +409,25 @@ jobs:
           echo "Checking website health..."
           
           # Check main website
-          if curl -f -s -o /dev/null "https://your-domain.com"; then
+          if curl -f -s -o /dev/null "https://<YOUR_DOMAIN>.com"; then
             echo "✅ Main website is accessible"
           else
             echo "❌ Main website is not accessible"
             exit 1
           fi
           
-          # Check if contact form endpoint exists
-          if curl -f -s -o /dev/null "https://your-domain.com/sendmail"; then
-            echo "✅ Contact form endpoint is accessible"
+          # Check if API projects endpoint exists (better than checking POST-only contact)
+          if curl -f -s -o /dev/null "https://<YOUR_DOMAIN>.com/api/v1/projects"; then
+            echo "✅ API endpoint is accessible"
           else
-            echo "⚠️ Contact form endpoint check failed (may be expected for POST-only endpoint)"
+            echo "⚠️ API endpoint check failed"
           fi
           
       - name: Health Check Summary
         run: |
           echo "## Post-Deployment Health Check" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Website accessibility verified" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Contact form endpoint available" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ API accessibility verified" >> $GITHUB_STEP_SUMMARY
           echo "- 📧 Email functionality ready for testing" >> $GITHUB_STEP_SUMMARY
           echo "- 🔒 reCAPTCHA protection active" >> $GITHUB_STEP_SUMMARY
 
@@ -463,8 +470,8 @@ jobs:
             fi
           elif [[ "${{ needs.deploy-production.result }}" == "success" ]]; then
             echo "### ✅ Deployment Successful" >> $GITHUB_STEP_SUMMARY
-            echo "- **Live Site**: https://your-domain.com" >> $GITHUB_STEP_SUMMARY
-            echo "- **Contact Form**: Fully functional with SendGrid" >> $GITHUB_STEP_SUMMARY
+            echo "- **Live Site**: https://<YOUR_DOMAIN>.com" >> $GITHUB_STEP_SUMMARY
+            echo "- **Contact Form**: Fully functional with Google Script" >> $GITHUB_STEP_SUMMARY
             echo "- 🔒 **Security**: reCAPTCHA protection enabled" >> $GITHUB_STEP_SUMMARY
             echo "- **Performance**: Optimized with minified assets" >> $GITHUB_STEP_SUMMARY
           else

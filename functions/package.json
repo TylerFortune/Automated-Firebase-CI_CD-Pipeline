@@ -1,6 +1,6 @@
 {
   "name": "functions",
-  "description": "Cloud Functions for Portfolio Backend",
+  "description": "Cloud Functions for Firebase CI/CD Pipeline Template",
   "scripts": {
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
@@ -10,14 +10,13 @@
     "logs": "firebase functions:log"
   },
   "engines": {
-    "node": "18"
+    "node": "22"
   },
   "main": "index.js",
   "dependencies": {
     "firebase-admin": "^11.0.0",
     "firebase-functions": "^4.0.0",
     "cors": "^2.8.5",
-    "@sendgrid/mail": "^7.7.0",
     "axios": "^1.0.0"
   },
   "devDependencies": {
